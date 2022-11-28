@@ -11,7 +11,6 @@ func main() {
 
 	r := gin.New()
 
-	// 测试log
 	defer log.Sync()
 
 	// 测试metric

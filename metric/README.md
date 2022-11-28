@@ -87,6 +87,8 @@ func main() {
 
 ## 显示
 
-`http://localhost/metrics`
+`http://localhost/metrics` 
+
+![metric.png](../pic/metric.png) 
 
 里面默认包含了一些基本的go相关信息，而api相关信息会在该api第一次请求后显示
