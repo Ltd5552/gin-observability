@@ -2,8 +2,7 @@ package main
 
 import (
 	"github.com/Ltd5552/gin-observability/log"
-	"github.com/Ltd5552/gin-observability/metric"
-	"github.com/Ltd5552/gin-observability/trace"
+	"github.com/Ltd5552/gin-observability/observability"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,11 +12,13 @@ func main() {
 
 	defer log.Sync()
 
-	// 测试metric
-	metric.Set(r)
+	//// 设置metric
+	//metric.Set(r)
+	//
+	//// 设置trace
+	//trace.Set(r, "ServerName")
 
-	// 测试trace
-	trace.Set(r, "test")
+	observability.Set(r, "test")
 
 	r.GET("/get", func(c *gin.Context) {
 		c.JSON(200, gin.H{

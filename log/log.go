@@ -146,7 +146,7 @@ var std = New(os.Stderr, InfoLevel)
 
 var traceID string
 var spanID string
-var FileName = "test.log"
+var FileName string
 
 func getID(c *gin.Context) {
 	if oteltrace.SpanFromContext(c.Request.Context()).SpanContext().IsValid() {
