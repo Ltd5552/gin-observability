@@ -38,7 +38,7 @@ func init() {
 	prometheus.MustRegister(RequestDuration, RequestCount, RequestErrorCount)
 }
 
-func PrometheusMW(c *gin.Context) {
+func prometheusMW(c *gin.Context) {
 	// 开始计时
 	Start := time.Now()
 
@@ -66,5 +66,5 @@ func PrometheusMW(c *gin.Context) {
 
 func Set(r *gin.Engine) {
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	r.Use(PrometheusMW)
+	r.Use(prometheusMW)
 }
