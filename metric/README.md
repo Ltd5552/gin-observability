@@ -2,7 +2,7 @@
 
 ## 介绍
 
-基于prometheus的client_golang和gin实现，该中间件实现了对gin框架下api的三个指标监控，包含请求耗时、请求次数以及请求错误次数，默认/metrics路径为prometheus获取
+基于prometheus的client_golang和gin实现，该中间件实现了对gin框架下api的三个指标，包含请求耗时、请求次数以及请求错误，基于promQL能实现R.E.D监控指标，默认/metrics路径为prometheus获取
 
 
 ## 使用
@@ -25,7 +25,7 @@ metric.Set(r)
 
 下面是一个示例
 
-```go
+``` go
 package main
 
 import (
@@ -87,6 +87,6 @@ func main() {
 
 ## 显示
 
-your_url/metrics
+`http://localhost:port/metrics`
 
 里面默认包含了一些基本的go相关信息，而api相关信息会在该api第一次请求后显示
