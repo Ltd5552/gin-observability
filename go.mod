@@ -1,4 +1,4 @@
-module gin-observability
+module github.com/Ltd5552/gin-observability
 
 go 1.19
 
