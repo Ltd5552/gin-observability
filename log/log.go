@@ -144,9 +144,17 @@ type Logger struct {
 
 var std = New(os.Stderr, InfoLevel)
 
+//var std *Logger
+
 var traceID string
 var spanID string
-var FileName string
+var fileName = "gin.log"
+
+//func Set(filename string) {
+//	fileName = filename + ".log"
+//	fmt.Println("inside the Set:" + fileName)
+//	std = New(os.Stderr, InfoLevel)
+//}
 
 func getID(c *gin.Context) {
 	if oteltrace.SpanFromContext(c.Request.Context()).SpanContext().IsValid() {
@@ -168,7 +176,7 @@ func New(writer io.Writer, level Level) *Logger {
 	// 自定义日志文件写入格式
 	opts := []zapcore.WriteSyncer{
 		zapcore.AddSync(&lumberjack.Logger{
-			Filename:   FileName,
+			Filename:   fileName,
 			MaxSize:    1024,
 			MaxBackups: 20,
 			MaxAge:     28,

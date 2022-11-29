@@ -10,21 +10,22 @@ func main() {
 
 	r := gin.New()
 
-	defer log.Sync()
-
-	//// 设置metric
+	// 设置metric
 	//metric.Set(r)
-	//
-	//// 设置trace
+
+	// 设置trace
 	//trace.Set(r, "ServerName")
 
-	observability.Set(r, "test")
+	observability.Set(r, "gin-observability")
+
+	defer log.Sync()
 
 	r.GET("/get", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "get",
 		})
-		log.Info(c, "test")
+		log.Info(c, "get successfully")
+
 	})
 
 	_ = r.Run()
