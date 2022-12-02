@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	oteltrace "go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -30,38 +31,45 @@ const (
 type Field = zap.Field
 
 func (l *Logger) Debug(c *gin.Context, msg string, fields ...Field) {
-	getID(c)
-	l.l.Debug(msg, fields...)
+	traceID, spanID := getID(c)
+	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
+	l.l.Debug(ms+msg, fields...)
 }
 
 func (l *Logger) Info(c *gin.Context, msg string, fields ...Field) {
-	getID(c)
-	l.l.Info(msg, fields...)
+	traceID, spanID := getID(c)
+	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
+	l.l.Info(ms+msg, fields...)
 }
 
 func (l *Logger) Warn(c *gin.Context, msg string, fields ...Field) {
-	getID(c)
-	l.l.Warn(msg, fields...)
+	traceID, spanID := getID(c)
+	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
+	l.l.Warn(ms+msg, fields...)
 }
 
 func (l *Logger) Error(c *gin.Context, msg string, fields ...Field) {
-	getID(c)
-	l.l.Error(msg, fields...)
+	traceID, spanID := getID(c)
+	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
+	l.l.Error(ms+msg, fields...)
 }
 
 func (l *Logger) DPanic(c *gin.Context, msg string, fields ...Field) {
-	getID(c)
-	l.l.DPanic(msg, fields...)
+	traceID, spanID := getID(c)
+	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
+	l.l.DPanic(ms+msg, fields...)
 }
 
 func (l *Logger) Panic(c *gin.Context, msg string, fields ...Field) {
-	getID(c)
-	l.l.Panic(msg, fields...)
+	traceID, spanID := getID(c)
+	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
+	l.l.Panic(ms+msg, fields...)
 }
 
 func (l *Logger) Fatal(c *gin.Context, msg string, fields ...Field) {
-	getID(c)
-	l.l.Fatal(msg, fields...)
+	traceID, spanID := getID(c)
+	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
+	l.l.Fatal(ms+msg, fields...)
 }
 
 // function variables for all field types
@@ -144,23 +152,23 @@ type Logger struct {
 
 var std = New(os.Stderr, InfoLevel)
 
-//var std *Logger
-
-var traceID string
-var spanID string
 var fileName = "gin.log"
 
-//func Set(filename string) {
-//	fileName = filename + ".log"
-//	fmt.Println("inside the Set:" + fileName)
-//	std = New(os.Stderr, InfoLevel)
-//}
+func Set(filename string) {
+	fileName = filename + ".log"
+	fmt.Println("inside the Set:" + fileName)
+	std = New(os.Stderr, InfoLevel)
+}
 
-func getID(c *gin.Context) {
+// 获取traceID和spanID
+func getID(c *gin.Context) (string, string) {
+	var traceID string
+	var spanID string
 	if oteltrace.SpanFromContext(c.Request.Context()).SpanContext().IsValid() {
 		traceID = oteltrace.SpanFromContext(c.Request.Context()).SpanContext().TraceID().String()
 		spanID = oteltrace.SpanFromContext(c.Request.Context()).SpanContext().SpanID().String()
 	}
+	return traceID, spanID
 }
 
 func Default() *Logger {
@@ -199,8 +207,9 @@ func New(writer io.Writer, level Level) *Logger {
 
 	// 自定义文件：行号输出项
 	customCallerEncoder := func(caller zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder) {
-		enc.AppendString("[TraceID " + traceID + "]")
-		enc.AppendString("[SpanID " + spanID + "]")
+		//这种的话存在并发问题
+		//enc.AppendString("[TraceID " + traceID + "]")
+		//enc.AppendString("[SpanID " + spanID + "]")
 		enc.AppendString("[" + caller.TrimmedPath() + "]")
 	}
 

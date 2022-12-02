@@ -10,7 +10,7 @@
 
 ### What it can't do?
 
-- metric：仅仅作为客户端的exporter。不能进行数据的分析、告警与可视化，需配合promethues和grafana等使用
+- metric：仅仅作为客户端的exporter。不能进行数据的分析、告警与可视化，需配合prometheus和grafana等使用
 - trace：不包含任何exporter。不能直接观测到链路信息，仅在日志中输出，若需要请参考otel文档并结合jaeger等使用
 - log：只能结合gin.context使用。为了到达记录traceID和spanID的效果必须传入gin.context
 
@@ -26,6 +26,7 @@ import "github.com/Ltd5552/gin-observability/observability"
 r := gin.New()
 // 传入gin.engine和应用名（作为链路的服务名）
 observability.Set(r, "ServerName")
+defer log.Sync()
 ```
 
 #### 分别使用
@@ -47,21 +48,55 @@ metric.Set(r)
 **若仅需要trace和log功能：**
 
 ``` go
-import (
-	"github.com/Ltd5552/gin-observability/log"
-	"github.com/Ltd5552/gin-observability/trace"
-	"github.com/gin-gonic/gin"
+import(
+    "github.com/gin-gonic/gin"
+    "github.com/Ltd5552/gin-observability/trace"
+    "github.com/Ltd5552/gin-observability/log"
 )
 
 r := gin.New()
 
 // 设置trace
-trace.Set(r, "ServerName")
+trace.Set(r, "gin-observability")
 
-// log无需设置，直接使用即可
+defer log.Sync()
+
+r.GET("/get", func(c *gin.Context) {
+    c.JSON(200, gin.H{
+        "message": "get",
+    })
+    // 使用log
+    log.Info(c, "get successfully", zap.String("ping", "pong"))
+
+})
+
 ```
 
-若三个都用到就直接用集成的observability模块就好
+**若三个都用到使用集成的observability模块**
+
+``` go
+import(
+    "github.com/gin-gonic/gin"
+    "github.com/Ltd5552/gin-observability/observability"
+    "github.com/Ltd5552/gin-observability/log"
+)
+
+r := gin.New()
+
+observability.Set(r, "gin-observability")
+
+defer log.Sync()
+
+r.GET("/get", func(c *gin.Context) {
+    c.JSON(200, gin.H{
+        "message": "get",
+    })
+    // 使用log
+    log.Info(c, "get successfully", zap.String("ping", "pong"))
+
+})
+
+```
 
 ### P.S
 
@@ -71,5 +106,5 @@ trace.Set(r, "ServerName")
 
 设想：采用option模式，增添更多的可选择性：
 
-- 选择是否添加trace exporter
-- 选择是否自定义log日志文件参数
+- 是否添加trace exporter
+- 是否自定义log日志文件参数

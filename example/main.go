@@ -4,6 +4,7 @@ import (
 	"github.com/Ltd5552/gin-observability/log"
 	"github.com/Ltd5552/gin-observability/observability"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 		c.JSON(200, gin.H{
 			"message": "get",
 		})
-		log.Info(c, "get successfully")
+		log.Info(c, "get successfully", zap.String("ping", "pong"))
 
 	})
 
