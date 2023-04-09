@@ -4,19 +4,13 @@ import (
 	"github.com/Ltd5552/gin-observability/log"
 	"github.com/Ltd5552/gin-observability/observability"
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 func main() {
 
 	r := gin.New()
 
-	// 设置metric
-	//metric.Set(r)
-
-	// 设置trace
-	//trace.Set(r, "ServerName")
-
+	// 直接统一设置
 	observability.Set(r, "gin-observability")
 
 	defer log.Sync()
@@ -25,9 +19,14 @@ func main() {
 		c.JSON(200, gin.H{
 			"message": "get",
 		})
-		log.Info(c, "get successfully", zap.String("ping", "pong"))
+		// 使用普通的zap.Info
+		log.Info("get successfully")
 
+		// 使用InfoWithID，第一个参数是gin.Context
+		log.InfoWithID(c, "get successfully")
 	})
 
 	_ = r.Run()
 }
+
+//Happy B-day Goland

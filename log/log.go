@@ -1,7 +1,6 @@
 package log
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	oteltrace "go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -30,46 +29,74 @@ const (
 
 type Field = zap.Field
 
-func (l *Logger) Debug(c *gin.Context, msg string, fields ...Field) {
+func (l *Logger) DebugWithID(c *gin.Context, msg string, fields ...Field) {
 	traceID, spanID := getID(c)
 	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
 	l.l.Debug(ms+msg, fields...)
 }
 
-func (l *Logger) Info(c *gin.Context, msg string, fields ...Field) {
+func (l *Logger) InfoWithID(c *gin.Context, msg string, fields ...Field) {
 	traceID, spanID := getID(c)
 	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
 	l.l.Info(ms+msg, fields...)
 }
 
-func (l *Logger) Warn(c *gin.Context, msg string, fields ...Field) {
+func (l *Logger) WarnWithID(c *gin.Context, msg string, fields ...Field) {
 	traceID, spanID := getID(c)
 	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
 	l.l.Warn(ms+msg, fields...)
 }
 
-func (l *Logger) Error(c *gin.Context, msg string, fields ...Field) {
+func (l *Logger) ErrorWithID(c *gin.Context, msg string, fields ...Field) {
 	traceID, spanID := getID(c)
 	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
 	l.l.Error(ms+msg, fields...)
 }
 
-func (l *Logger) DPanic(c *gin.Context, msg string, fields ...Field) {
+func (l *Logger) DPanicWithID(c *gin.Context, msg string, fields ...Field) {
 	traceID, spanID := getID(c)
 	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
 	l.l.DPanic(ms+msg, fields...)
 }
 
-func (l *Logger) Panic(c *gin.Context, msg string, fields ...Field) {
+func (l *Logger) PanicWithID(c *gin.Context, msg string, fields ...Field) {
 	traceID, spanID := getID(c)
 	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
 	l.l.Panic(ms+msg, fields...)
 }
 
-func (l *Logger) Fatal(c *gin.Context, msg string, fields ...Field) {
+func (l *Logger) FatalWithID(c *gin.Context, msg string, fields ...Field) {
 	traceID, spanID := getID(c)
 	ms := "[traceID " + traceID + "] [spanID " + spanID + "] "
 	l.l.Fatal(ms+msg, fields...)
+}
+
+func (l *Logger) Debug(msg string, fields ...Field) {
+	l.l.Debug(msg, fields...)
+}
+
+func (l *Logger) Info(msg string, fields ...Field) {
+	l.l.Info(msg, fields...)
+}
+
+func (l *Logger) Warn(msg string, fields ...Field) {
+	l.l.Warn(msg, fields...)
+}
+
+func (l *Logger) Error(msg string, fields ...Field) {
+	l.l.Error(msg, fields...)
+}
+
+func (l *Logger) DPanic(msg string, fields ...Field) {
+	l.l.DPanic(msg, fields...)
+}
+
+func (l *Logger) Panic(msg string, fields ...Field) {
+	l.l.Panic(msg, fields...)
+}
+
+func (l *Logger) Fatal(msg string, fields ...Field) {
+	l.l.Fatal(msg, fields...)
 }
 
 // function variables for all field types
@@ -124,6 +151,14 @@ var (
 	Durationp   = zap.Durationp
 	Any         = zap.Any
 
+	InfoWithID   = std.InfoWithID
+	WarnWithID   = std.WarnWithID
+	ErrorWithID  = std.ErrorWithID
+	DPanicWithID = std.DPanicWithID
+	PanicWithID  = std.PanicWithID
+	FatalWithID  = std.FatalWithID
+	DebugWithID  = std.DebugWithID
+
 	Info   = std.Info
 	Warn   = std.Warn
 	Error  = std.Error
@@ -143,6 +178,14 @@ func ResetDefault(l *Logger) {
 	Panic = std.Panic
 	Fatal = std.Fatal
 	Debug = std.Debug
+
+	InfoWithID = std.InfoWithID
+	WarnWithID = std.WarnWithID
+	ErrorWithID = std.ErrorWithID
+	DPanicWithID = std.DPanicWithID
+	PanicWithID = std.PanicWithID
+	FatalWithID = std.FatalWithID
+	DebugWithID = std.DebugWithID
 }
 
 type Logger struct {
@@ -154,11 +197,9 @@ var std = New(os.Stderr, InfoLevel)
 
 var fileName = "gin.log"
 
-func Set(filename string) {
-	fileName = filename + ".log"
-	fmt.Println("inside the Set:" + fileName)
-	std = New(os.Stderr, InfoLevel)
-}
+//func Set(filename string) {
+//	fileName = filename + ".log"
+//}
 
 // 获取traceID和spanID
 func getID(c *gin.Context) (string, string) {

@@ -5,6 +5,7 @@
 基于zap的封装，为了在日志中添加traceID和spanID两个信息每次记录日志时需传递gin.context进去，需配合trace包使用
 
 ## 使用
+由于存在是否需要传入gin.context两种情况，所以保留了初始的方法Info，而在需要传入gin.context的方法后面统一加了`WithID`，比如InfoWithID等等
 
 ``` go
 import (
@@ -24,7 +25,8 @@ func main() {
 
 	r.GET("/get", func(c *gin.Context) {
         // 使用log，第一个参数是gin.Context
-		log.Info(c, "test")
+		log.InfoWithID(c, "test")
+		log.Info("test")
 	})
 }
 

@@ -12,10 +12,12 @@
 
 - metric：仅仅作为客户端的exporter。不能进行数据的分析、告警与可视化，需配合prometheus和grafana等使用
 - trace：不包含任何exporter。不能直接观测到链路信息，仅在日志中输出，若需要请参考otel文档并结合jaeger等使用
-- log：只能结合gin.context使用。为了到达记录traceID和spanID的效果必须传入gin.context
+- log：可选择性结合gin.context使用。为了到达日志记录traceID和spanID的效果则必须传入gin.context
 
 ### 使用
-
+``` shell
+go get -u github.com/Ltd5552/gin-observability
+```
 #### 集成使用
 
 为了更加方便，引入了observability包将metric和trace模块整合到一起，可直接使用即可
@@ -24,8 +26,11 @@
 import "github.com/Ltd5552/gin-observability/observability"
 
 r := gin.New()
+
 // 传入gin.engine和应用名（作为链路的服务名）
+
 observability.Set(r, "ServerName")
+
 defer log.Sync()
 ```
 
@@ -65,8 +70,11 @@ r.GET("/get", func(c *gin.Context) {
     c.JSON(200, gin.H{
         "message": "get",
     })
-    // 使用log
-    log.Info(c, "get successfully", zap.String("ping", "pong"))
+    // 使用普通的zap的log
+    log.Info("get successfully")
+    
+    // 使用能打印traceID和spanID的log
+    log.InfoWithID(c, "get successfully")
 
 })
 
@@ -91,8 +99,10 @@ r.GET("/get", func(c *gin.Context) {
     c.JSON(200, gin.H{
         "message": "get",
     })
-    // 使用log
-    log.Info(c, "get successfully", zap.String("ping", "pong"))
+    // 使用普通的zap的log
+    log.Info("get successfully", zap.String("ping", "pong"))
+    // 使用能打印traceID和spanID的log
+    log.InfoWithID(c, "get successfully", zap.String("ping", "pong"))
 
 })
 
